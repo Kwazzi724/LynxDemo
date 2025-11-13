@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <6502.h> 
 
-// extern void drawRaytracer(void); // dok's :)
-extern void drawRaytracer(void);
+extern void drawRaytrace(void); // dok's :)
 
 // confines
 #define SCREEN_WIDTH  160
@@ -192,6 +191,7 @@ static void draw_man_silhouette(void)
     }
 }
 
+#if 0  // UNUSED
 // clear only the text above the head 
 static void clear_text_band(void)
 {
@@ -203,6 +203,7 @@ static void clear_text_band(void)
     tgi_setcolor(BG_COLOR);
     tgi_bar(0, top, SCREEN_WIDTH - 1, bottom);
 }
+#endif
 
 // show one sentence at a time centered above the head, then hold it
 //static void show_sentence(const char* text, unsigned char hold_seconds)
@@ -887,7 +888,7 @@ static unsigned char worldMap[MAP_HEIGHT][MAP_WIDTH] = {
      {1,1,1,1,1,1,1,1}  /* 8 */
 };
 
-static int playerX;            
+static int playerX;
 static int playerY;
 static unsigned char playerAngle = 0;
 
@@ -963,7 +964,7 @@ static unsigned char window_active = 0;
 static unsigned char window_inited = 0;
 
 static unsigned char angle_for_step(int dx, int dy);
-static void begin_step_from_to(Tile from, Tile to);
+static void begin_step_from_to(const Tile* from, const Tile* to);
 static void init_path_and_player(void);
 static void update_auto_movement(void);
 static void cast_smooth_rays(void);
@@ -1038,14 +1039,14 @@ static unsigned char angle_for_step(int dx, int dy)
     return playerAngle;
 }
 
-static void begin_step_from_to(Tile from, Tile to)
+static void begin_step_from_to(const Tile* from, const Tile* to)
 {
-    int fromX = TILE_CENTER_FIXED(from.x);
-    int fromY = TILE_CENTER_FIXED(from.y);
-    int toX = TILE_CENTER_FIXED(to.x);
-    int toY = TILE_CENTER_FIXED(to.y);
-    int dx_tiles = (int)to.x - (int)from.x;
-    int dy_tiles = (int)to.y - (int)from.y;
+    int fromX = TILE_CENTER_FIXED(from->x);
+    int fromY = TILE_CENTER_FIXED(from->y);
+    int toX = TILE_CENTER_FIXED(to->x);
+    int toY = TILE_CENTER_FIXED(to->y);
+    int dx_tiles = (int)to->x - (int)from->x;
+    int dy_tiles = (int)to->y - (int)from->y;
 
     step_dx_fixed = (toX - fromX) / FRAMES_PER_STEP;
     step_dy_fixed = (toY - fromY) / FRAMES_PER_STEP;
@@ -1062,15 +1063,10 @@ static void init_path_and_player(void)
     path_index = 0;
     frames_into_step = 0;
 
-    if (PATH_LEN < 2)
-    {
-        movement_done = 1;
-    }
-    else
-    {
-        movement_done = 0;
-        begin_step_from_to(PATH[0], PATH[1]);
-    }
+
+    movement_done = 0;
+    begin_step_from_to(&PATH[0], &PATH[1]);
+
 }
 
 static void pause_with_window(unsigned char seconds)
@@ -1119,7 +1115,7 @@ static void update_auto_movement(void)
         }
         else
         {
-            begin_step_from_to(PATH[path_index], PATH[path_index + 1]);
+            begin_step_from_to(&PATH[path_index], &PATH[path_index + 1]);
         }
     }
 }
@@ -1242,7 +1238,7 @@ static void run_raycaster_scene(void)
     tgi_updatedisplay();
 
     // dok's full-screen raytracer painting
-    drawRaytracer();
+    drawRaytrace();
     tgi_updatedisplay();      // in case lib doesn't do it itself
     wait_seconds(3);          // show raytracer for 8 seconds
 
@@ -1272,7 +1268,7 @@ static void run_raycaster_scene(void)
     //}
 }
 
-static void run_ending_scene(void) 
+static void run_ending_scene(void)
 {
     tgi_setbgcolor(0);
     tgi_clear();
