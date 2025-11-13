@@ -1,0 +1,28 @@
+Handy Development Pack - Archive contents
+-----------------------------------------
+
+This archive should contain the following files:
+
+HANDYBUG.EXE    - Handy with debugging features compiled in.
+
+DVREADME.TXT    - Developer specific readme file.
+
+CONTENTS.TXT    - This file.
+
+LICENSE.TXT     - Handy user license info
+
+FILE_ID.DIZ     - Short description.
+
+HANDYBOOT.IMG   - Dummy Lynx boot image
+
+MAKE_LNX.C      - LYX to LNX file conversion utility.
+MAKE_LNX.EXE
+
+SERIAL.C        - BLL Serial download program for 42Bastians
+SERIAL.EXE        Lynx development cartridge.
+
+ROTATE.CPP      - Program to manipulate the ROTATION flag
+ROTATE.EXE        of any LNX file.
+
+EXAMPLE.SCR     - Example script showing how to use debug messaging
+

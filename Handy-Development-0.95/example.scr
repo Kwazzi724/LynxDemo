@@ -1,0 +1,20 @@
+rem
+rem - Handy Debugging Script
+rem
+
+rem
+rem - This will insert a Debug messgae output at PC=0x1000
+rem - Debug message is stored at 0x1000
+rem - the message says "Hello World"
+rem
+ms 1000 ec a5 5a ec 10 00 ea ea
+ms 0010 48 65 6C 6C 6F 20 57 6F 72 6C 64 00
+
+rem - Now a register dump
+ms 1008 ec a5 5a ec ff ff ea ea
+
+rem - Now lets breakpoint
+ms 1010 ec a5 5a ec 00 00 ea ea
+
+run 1000
+

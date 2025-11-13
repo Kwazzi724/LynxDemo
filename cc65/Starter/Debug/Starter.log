@@ -1,0 +1,2 @@
+﻿  The system cannot find the path specified.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.MakeFile.Targets(46,5): error MSB3073: The command ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\nmake.exe" /f game.mak BUILD=Debug all" exited with code 3.
