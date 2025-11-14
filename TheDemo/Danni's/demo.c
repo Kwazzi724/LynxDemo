@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <6502.h> 
 
-extern void drawRaytrace(void); // dok's :)
+// extern void drawRaytrace(void); // dok's :)
+extern void drawRaytrace(char paintingNumber);
 
 /*extern void drawStilllife(void);
 extern void drawFem1(void);
@@ -916,7 +917,7 @@ static const Tile ART_TILES[] =
 {
     {6, 5},// stilllife 
     {5, 5},// fem1 
-    {1, 3},// male 
+    // {1, 3},// male 
     // {2, 3},// malegamer 
 };
 #define ART_TILE_COUNT ((int)(sizeof(ART_TILES)/sizeof(ART_TILES[0])))
@@ -1179,19 +1180,19 @@ static void show_art_effect(unsigned char index)
     {
     case 0: // stilllife
         // drawStilllife();
-        drawRaytrace();
+        drawRaytrace(0);
         break;
     case 1: // fem1
         // drawFem1();
-        drawRaytrace();
+        drawRaytrace(1);
         break;
     case 2: // male
         // drawMale();
-        drawRaytrace();
+        drawRaytrace(2);
         break;
     case 3: // malegamer
         // drawMaleGamer();
-        drawRaytrace();
+        // drawRaytrace();
         break;
     default:
         return;
@@ -1397,7 +1398,7 @@ static void run_raycaster_scene(void)
     tgi_updatedisplay();
 
     // dok's full-screen raytracer painting
-    drawRaytrace();
+    drawRaytrace(3);
     // drawMaleGamer();
     tgi_updatedisplay();      // in case lib doesn't do it itself
     wait_seconds(3);          // show raytracer for 8 seconds
