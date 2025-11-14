@@ -5,6 +5,11 @@
 
 extern void drawRaytrace(void); // dok's :)
 
+/*extern void drawStilllife(void);
+extern void drawFem1(void);
+extern void drawMale(void);
+extern void drawMaleGamer(void); */
+
 // confines
 #define SCREEN_WIDTH  160
 #define SCREEN_HEIGHT 102
@@ -882,8 +887,8 @@ static unsigned char worldMap[MAP_HEIGHT][MAP_WIDTH] = {
      {1,1,1,1,0,1,1,1}, /* 2 */
      {1,0,0,0,0,0,0,1}, /* 3 */
      {1,0,1,1,1,1,1,1}, /* 4 */
-     {1,0,0,0,0,0,1,1}, /* 5 */
-     {1,1,1,1,0,0,0,1}, /* 6 */
+     {1,0,0,0,0,0,0,1}, /* 5 */
+     {1,1,1,1,1,1,0,1}, /* 6 */
      {1,0,0,0,0,0,0,1}, /* 7 */
      {1,1,1,1,1,1,1,1}  /* 8 */
 };
@@ -898,12 +903,30 @@ typedef struct Tile {
 } Tile;
 
 static const Tile PATH[] = {
-    {1,7}, {2,7}, {3,7}, {4,7}, {4,6},
-    {4,5}, {3,5}, {2,5}, {1,5}, {1,4},
-    {1,3}, {2,3}, {3,3}, {4,3}, {4,2},
-    {4,1}, {5,1}, {6,1},
+    {1,7}, {2,7}, {3,7}, {4,7}, {5,7},
+    {6,7}, {6,6}, {6,5}, {5,5}, {4,5},
+    {3,5}, {2,5}, {1,5}, {1,4}, {1,3},
+    {2,3}, {3,3}, {4,3}, {4,2}, {4,1},
+    {3,1}, {2,1}, {1,1}, {3,1}, {4,1}, {5,1},
+    {6,1},
 };
 #define PATH_LEN ((int)(sizeof(PATH)/sizeof(PATH[0])))
+
+static const Tile ART_TILES[] =
+{
+    {6, 5},// stilllife 
+    {5, 5},// fem1 
+    {1, 3},// male 
+    // {2, 3},// malegamer 
+};
+#define ART_TILE_COUNT ((int)(sizeof(ART_TILES)/sizeof(ART_TILES[0])))
+
+static const Tile WINDOW_TILES[] =
+{
+    {6, 7}, 
+    {2, 5}, 
+};
+#define WINDOW_TILE_COUNT ((int)(sizeof(WINDOW_TILES)/sizeof(WINDOW_TILES[0])))
 
 static const signed char sin_table[64] = {
     0, 6, 12, 18, 24, 30, 36, 42, 48, 53, 58, 63, 68, 72, 76, 79,
@@ -955,6 +978,16 @@ static unsigned char movement_done = 0;
 #define RAIN_MIN_Y   (WIN_Y + 1)
 #define RAIN_MAX_Y   (WIN_BOTTOM - 1)
 
+// painting rectangle 
+#define PAINT_W      66
+#define PAINT_H      40
+#define PAINT_X      ((SCREEN_WIDTH  - PAINT_W) / 2)
+#define PAINT_Y      ((SCREEN_HEIGHT - PAINT_H) / 2)
+#define PAINT_RIGHT  (PAINT_X + PAINT_W - 1)
+#define PAINT_BOTTOM (PAINT_Y + PAINT_H - 1)
+#define PAINT_FILL_COLOR   0   
+#define PAINT_FRAME_COLOR  9 
+
 typedef struct {
     int x; int y; unsigned char color;
 } RayRain;
@@ -968,6 +1001,30 @@ static void begin_step_from_to(const Tile* from, const Tile* to);
 static void init_path_and_player(void);
 static void update_auto_movement(void);
 static void cast_smooth_rays(void);
+
+// helper to check for window tile
+static unsigned char is_window_tile_xy(unsigned char x, unsigned char y)
+{
+    int i;
+    for (i = 0; i < WINDOW_TILE_COUNT; ++i)
+    {
+        if (WINDOW_TILES[i].x == x && WINDOW_TILES[i].y == y)
+            return 1;
+    }
+    return 0;
+}
+
+// helper to check for art tile
+static signed char find_art_index_for_tile(unsigned char x, unsigned char y)
+{
+    int i;
+    for (i = 0; i < ART_TILE_COUNT; ++i)
+    {
+        if (ART_TILES[i].x == x && ART_TILES[i].y == y)
+            return (signed char)i;
+    }
+    return -1;
+}
 
 static void draw_window_pane(void)
 {
@@ -1030,6 +1087,24 @@ static void update_ray_rain(void)
     }
 }
 
+// draw painting
+static void draw_painting_rect(void)
+{
+    // fill
+    tgi_setcolor(PAINT_FILL_COLOR);
+    tgi_bar(PAINT_X, PAINT_Y, PAINT_RIGHT, PAINT_BOTTOM);
+    // frame
+    tgi_setcolor(PAINT_FRAME_COLOR);
+    // top
+    tgi_bar(PAINT_X, PAINT_Y, PAINT_RIGHT, PAINT_Y);
+    // bottom
+    tgi_bar(PAINT_X, PAINT_BOTTOM, PAINT_RIGHT, PAINT_BOTTOM);
+    // left
+    tgi_bar(PAINT_X, PAINT_Y, PAINT_X, PAINT_BOTTOM);
+    // right
+    tgi_bar(PAINT_RIGHT, PAINT_Y, PAINT_RIGHT, PAINT_BOTTOM);
+}
+
 static unsigned char angle_for_step(int dx, int dy)
 {
     if (dx > 0 && dy == 0) return 0;          // +x
@@ -1069,6 +1144,7 @@ static void init_path_and_player(void)
 
 }
 
+/// window render time
 static void pause_with_window(unsigned char seconds)
 {
     unsigned int frames;
@@ -1092,6 +1168,62 @@ static void pause_with_window(unsigned char seconds)
         tgi_updatedisplay();
         small_delay();
     }
+}
+
+#define RAYTRACE_SHOW_SECONDS 3
+
+// decide which painting to show
+static void show_art_effect(unsigned char index)
+{
+    switch (index)
+    {
+    case 0: // stilllife
+        // drawStilllife();
+        drawRaytrace();
+        break;
+    case 1: // fem1
+        // drawFem1();
+        drawRaytrace();
+        break;
+    case 2: // male
+        // drawMale();
+        drawRaytrace();
+        break;
+    case 3: // malegamer
+        // drawMaleGamer();
+        drawRaytrace();
+        break;
+    default:
+        return;
+    }
+}
+
+/// pause at painting time (basically same as pause with window but has its own name)
+static void pause_at_painting(unsigned char seconds, unsigned char artIndex)
+{
+    unsigned int frames;
+    unsigned int i;
+    frames = (unsigned int)seconds * 5;
+
+    for (i = 0; i < frames; ++i)
+    {
+        // redraw current scene/raycaster
+        cast_smooth_rays();     
+        // overlay painting rectangle
+        draw_painting_rect();   
+        tgi_updatedisplay();
+        small_delay();
+    }
+
+    // show the full-screen raytracer art for this painting
+    tgi_setbgcolor(0);
+    tgi_clear();
+    while (tgi_busy()) {}
+    tgi_updatedisplay();
+
+    show_art_effect(artIndex);
+    tgi_updatedisplay();
+    wait_seconds(RAYTRACE_SHOW_SECONDS);
 }
 
 static void update_auto_movement(void)
@@ -1218,20 +1350,47 @@ static void run_raycaster_scene(void)
         cast_smooth_rays();
         tgi_updatedisplay();
 
+        //// detect when player just stepped onto a new tile 
+        //if (path_index != last_path_index)
+        //{
+        //    last_path_index = path_index;
+
+        //    // every 3rd tile pause at a rainy window 
+        //    if ((path_index % 4) == 0 && path_index < PATH_LEN - 1)
+        //    {
+        //        pause_with_window(1);   // look at window for ~2 sec
+        //    }
+        //}
+
         // detect when player just stepped onto a new tile 
         if (path_index != last_path_index)
         {
-            last_path_index = path_index;
+            unsigned char tx;
+            unsigned char ty;
+            signed char artIndex;
 
-            // every 3rd tile pause at a rainy window 
-            if ((path_index % 4) == 0 && path_index < PATH_LEN - 1)
+            last_path_index = path_index;
+            tx = PATH[path_index].x;
+            ty = PATH[path_index].y;
+
+            // if window tile: show rainy window
+            if (is_window_tile_xy(tx, ty) && path_index < PATH_LEN)
             {
-                pause_with_window(1);   // look at window for ~2 sec
+                pause_with_window(1);
+            }
+            else
+            {
+                // if art tile: show painting + matching piece
+                artIndex = find_art_index_for_tile(tx, ty);
+                if (artIndex >= 0 && path_index < PATH_LEN)
+                {
+                    pause_at_painting(1, (unsigned char)artIndex);
+                }
             }
         }
     }
 
-    // reached final tile: show paiting
+    //// reached final tile: show paiting
     tgi_setbgcolor(0);
     tgi_clear();
     while (tgi_busy()) {}
@@ -1239,6 +1398,7 @@ static void run_raycaster_scene(void)
 
     // dok's full-screen raytracer painting
     drawRaytrace();
+    // drawMaleGamer();
     tgi_updatedisplay();      // in case lib doesn't do it itself
     wait_seconds(3);          // show raytracer for 8 seconds
 
