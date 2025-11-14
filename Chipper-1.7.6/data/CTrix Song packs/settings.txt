@@ -1,0 +1,27 @@
+Timer 1000
+
+One click exporter on all sounds AS they will sound when played back (at 16726)
+
+Recognise volume command on import
+
+MOD import optimzer
+
+Save all instruments (in simple editor)
+
+Ability to mix levels
+
+Auto add .sin on insttrumets
+
+Crashes when I try to tune ostruments on playback
+
+when adding notes in tracker have option to play the rest of the line as note added in
+
+One of the notes in the tracker shows up as H?!
+
+
+Still geets stuck at measure...
+
+
+---
+
+Too scared to tune!  Crashes

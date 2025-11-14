@@ -1,0 +1,101 @@
+****************
+* Sound-variablen
+ BEGIN_ZP
+sound_zp_begin	equ *
+t1              ds 1
+t2              ds 2
+
+SndSema         ds 1            ; <>0 => Sound IRQ in progress
+SndPtrTmp       ds 2
+SndTmp          ds 2
+SndEnvPtr       ds 2
+
+SndRetAFlag	ds 1
+SndRetAFlag2	ds 1
+
+; Erstmal nur einen Samplekanal!!!
+ch1_start		ds 2			; Startadresse Sample 1
+ch1_end			ds 2			; Endadresse Sample 1
+ch1_off1		ds 2			; Soundkanal 1 Vorkommaanteil Sampleoffset
+ch1_off2		ds 2			; Soundkanal 1 Nachkommaanteil Sampleoffset
+ch1_off3		ds 2			; Soundkanal 1 berechneter Nachkommaanteil Sampleoffset
+ch1_rep_start	ds 2			; Repeat Startadresse Sample 1
+ch1_rep_end		ds 2			; Repeat Endadresse Sample 1
+ch1_repeat		ds 2			; Soundkanal 1 Repeat Check
+ch1_adroffset	ds 1			; 0,8,16,24 je nach Channel
+
+sound_zp_end equ *
+ END_ZP
+
+ BEGIN_MEM
+sound_mem_begin	equ *
+SndPtrLo        ds 4
+SndPtrHi        ds 4
+
+SndDelay        ds 4
+SndLoopCnt      ds 4
+SndLoopPtrLo    ds 4
+SndLoopPtrHi    ds 4
+SndVolume       ds 4
+SndMaxVolume    ds 4
+SndNotePlaying  ds 4
+SndRetAddr      ds 4*2
+
+SndActive       ds 4            ; <>0 => channel active
+SndReqStop      ds 4
+SndEnvVol       ds 4            ; <>0 => use envelope x
+SndEnvFrq       ds 4            ; dito
+SndEnvWave       ds 4            ; dito
+;>SndEnvPly       ds 4            ; dito
+
+SndChannel      ds 4*8          ; current values
+
+*
+* volume env.
+SndEnvVolCnt    ds 4
+SndEnvVolInc    ds 4
+SndEnvVolOff    ds 4
+SndEnvVolLoop   ds 4
+SndEnvVolParts  ds 4
+SndEnvVolParts2 ds 4
+
+
+*
+* frequenz env.
+SndEnvFrqCnt    ds 4
+SndEnvFrqInc    ds 4
+SndEnvFrqOff    ds 4
+SndEnvFrqLoop   ds 4
+SndEnvFrqParts  ds 4
+SndEnvFrqParts2 ds 4
+
+*
+* wave env.
+SndEnvWaveCnt    ds 4
+*** SndEnvWaveInc    ds 4
+SndEnvWaveOff    ds 4
+SndEnvWaveLoop   ds 4
+SndEnvWaveParts  ds 4
+SndEnvWaveParts2 ds 4
+
+*
+MAX_INSTRUMENTS		equ	64
+
+SndEnvVolPtrLo  ds MAX_INSTRUMENTS
+SndEnvVolPtrHi  ds MAX_INSTRUMENTS
+SndEnvFrqPtrLo  ds MAX_INSTRUMENTS
+SndEnvFrqPtrHi  ds MAX_INSTRUMENTS
+SndEnvWavePtrLo  ds MAX_INSTRUMENTS
+SndEnvWavePtrHi  ds MAX_INSTRUMENTS
+;>SndEnvPlyPtrLo  ds MAX_INSTRUMENTS
+;>SndEnvPlyPtrHi  ds MAX_INSTRUMENTS
+sound_mem_end equ *
+ END_MEM
+
+****************
+
+
+
+
+
+

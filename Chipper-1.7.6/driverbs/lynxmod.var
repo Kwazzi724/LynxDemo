@@ -1,0 +1,198 @@
+	BEGIN_ZP
+zeropage_pos1	set *
+echo "Zeropage before mod player %Hzeropage_pos1"
+
+IFD HALFFREQ
+mixer_channel_flag	ds	1
+ENDIF
+ch1_start	ds 2			; Startadresse Sample 1
+ch2_start	ds 2			; Startadresse Sample 2
+ch3_start	ds 2			; Startadresse Sample 3
+ch4_start	ds 2			; Startadresse Sample 4
+ch1_end		ds 2			; Endadresse Sample 1
+ch2_end		ds 2			; Endadresse Sample 2
+ch3_end		ds 2			; Endadresse Sample 3
+ch4_end		ds 2			; Endadresse Sample 4
+ch1_off1	ds 2			; Soundkanal 1 Vorkommaanteil Sampleoffset
+ch2_off1	ds 2			; Soundkanal 2 Vorkommaanteil Sampleoffset
+ch3_off1	ds 2			; Soundkanal 3 Vorkommaanteil Sampleoffset
+ch4_off1	ds 2			; Soundkanal 4 Vorkommaanteil Sampleoffset
+ch1_off2	ds 2			; Soundkanal 1 Nachkommaanteil Sampleoffset
+ch2_off2	ds 2			; Soundkanal 2 berechneter Nachkommaanteil Sampleoffset
+ch3_off2	ds 2			; Soundkanal 3 berechneter Nachkommaanteil Sampleoffset
+ch4_off2	ds 2			; Soundkanal 4 berechneter Nachkommaanteil Sampleoffset
+ch1_off3	ds 2			; Soundkanal 1 berechneter Nachkommaanteil Sampleoffset
+ch2_off3	ds 2			; Soundkanal 2 Nachkommaanteil Sampleoffset
+ch3_off3	ds 2			; Soundkanal 3 Nachkommaanteil Sampleoffset
+ch4_off3	ds 2			; Soundkanal 4 Nachkommaanteil Sampleoffset
+ch1_rep_start	ds 2			; Repeat Startadresse Sample 1
+ch2_rep_start	ds 2			; Repeat Startadresse Sample 2
+ch3_rep_start	ds 2			; Repeat Startadresse Sample 3
+ch4_rep_start	ds 2			; Repeat Startadresse Sample 4
+ch1_rep_end	ds 2			; Repeat Endadresse Sample 1
+ch2_rep_end	ds 2			; Repeat Endadresse Sample 2
+ch3_rep_end	ds 2			; Repeat Endadresse Sample 3
+ch4_rep_end	ds 2			; Repeat Endadresse Sample 4
+ch1_repeat	ds 2			; Soundkanal 1 Repeat Check
+ch2_repeat	ds 2			; Soundkanal 2 Repeat Check
+ch3_repeat	ds 2			; Soundkanal 3 Repeat Check
+ch4_repeat	ds 2			; Soundkanal 4 Repeat Check
+;; fx_start	ds 2			; Startadresse Fx Sample
+;; fx_end		ds 2			; Endadresse Fx Sample
+;; fx_off1		ds 2			; Fx Vorkommaanteil
+;; fx_off2		ds 2			; Fx berechneter Nachkommaanteil Sampleoffset
+;; fx_off3		ds 2			; Fx berechneter Nachkommaanteil Sampleoffset
+;; fx_volume	ds 1			; Fx Lautst�rke
+volume		ds 2			; Adresse Volume Register (nur Lynx II)
+module		ds 2			; aktuelle Adresse Moduledaten
+module1		ds 2			; Startadresse Moduledaten
+;; module_restart	ds 2			; Offset Restart Module
+position	ds 2			; aktuelle Adresse Patterndaten
+pattern		ds 1			; aktuelle Pattern Position (0 .. 63)
+bpm		ds 1			; Beats per Minute
+;; volume_count	ds 1			; Counter f�r Volume ein/ausblenden
+;; vbl_save	ds 4			; Speicher f�r �nderungen im VBL Interrupt
+;; hbl_save	ds 3			; Speicher f�r �nderungen im HBL Interrupt
+zeropage_pos2	set *
+echo "Zeropage after mod player %Hzeropage_pos2"
+zeropage_pos2	set  zeropage_pos2-zeropage_pos1
+echo "Zeropage needed for mod player %dzeropage_pos2"
+	END_ZP
+
+TUNING		EQU	0		; Feintuning festlegen ( 7 bis -8)
+ALLOW_INTERRUPT	EQU	1		; 0 = im Player keine Interrupts erlauben
+
+IFND SmpTimer
+SmpTimer	EQU	1
+ENDIF
+
+
+; Noten f�r 7 Oktaven. Diese Noten k�nnen beim Abspielen von
+; Fx Stimmen verwendet werden.
+; Referenznote ist Pitch_C3, d.h. bei dieser Note wird das Sample
+; unver�ndert gespielt.
+; Wird z.B. Pitch Pitch_C4 verwendet wird das Sample eine Oktave h�her
+; gespielt.
+
+Pitch_C0	EQU	2		; Oktave 0	C
+Pitch_Cis0	EQU	4		; Oktave 0	Cis/Des
+Pitch_D0	EQU	6		; Oktave 0	D
+Pitch_Dis0	EQU	8		; Oktave 0	Dis/Es
+Pitch_E0	EQU	10		; Oktave 0	E
+Pitch_F0	EQU	12		; Oktave 0	F
+Pitch_Fis0	EQU	14		; Oktave 0	Fis/Ges
+Pitch_G0	EQU	16		; Oktave 0	G
+Pitch_Gis0	EQU	18		; Oktave 0	Gis
+Pitch_A0	EQU	20		; Oktave 0	A
+Pitch_Ais0	EQU	22		; Oktave 0	Ais/B
+Pitch_H0	EQU	24		; Oktave 0 	H
+
+Pitch_C1	EQU	26		; Oktave 1	C
+Pitch_Cis1	EQU	28		; Oktave 1	Cis/Des
+Pitch_D1	EQU	30		; Oktave 1	D
+Pitch_Dis1	EQU	32		; Oktave 1	Dis/Es
+Pitch_E1	EQU	34		; Oktave 1	E
+Pitch_F1	EQU	36		; Oktave 1	F
+Pitch_Fis1	EQU	38		; Oktave 1	Fis/Ges
+Pitch_G1	EQU	40		; Oktave 1	G
+Pitch_Gis1	EQU	42		; Oktave 1	Gis
+Pitch_A1	EQU	44		; Oktave 1	A
+Pitch_Ais1	EQU	46		; Oktave 1	Ais/B
+Pitch_H1	EQU	48		; Oktave 1	H
+
+Pitch_C2	EQU	50		; Oktave 2	C
+Pitch_Cis2	EQU	52		; Oktave 2	Cis/Des
+Pitch_D2	EQU	54		; Oktave 2	D
+Pitch_Dis2	EQU	56		; Oktave 2	Dis/Es
+Pitch_E2	EQU	58		; Oktave 2	E
+Pitch_F2	EQU	60		; Oktave 2	F
+Pitch_Fis2	EQU	62		; Oktave 2	Fis/Ges
+Pitch_G2	EQU	64		; Oktave 2	G
+Pitch_Gis2	EQU	66		; Oktave 2	Gis
+Pitch_A2	EQU	68		; Oktave 2	A
+Pitch_Ais2	EQU	70		; Oktave 2	Ais/B
+Pitch_H2	EQU	72		; Oktave 2 	H
+
+Pitch_C3	EQU	74		; Oktave 3	C
+Pitch_Cis3	EQU	76		; Oktave 3	Cis/Des
+Pitch_D3	EQU	78		; Oktave 3	D
+Pitch_Dis3	EQU	80		; Oktave 3	Dis/Es
+Pitch_E3	EQU	82		; Oktave 3	E
+Pitch_F3	EQU	84		; Oktave 3	F
+Pitch_Fis3	EQU	86		; Oktave 3	Fis/Ges
+Pitch_G3	EQU	88		; Oktave 3	G
+Pitch_Gis3	EQU	90		; Oktave 3	Gis
+Pitch_A3	EQU	92		; Oktave 3	A
+Pitch_Ais3	EQU	94		; Oktave 3	Ais/B
+Pitch_H3	EQU	96		; Oktave 3 	H
+
+Pitch_C4	EQU	98		; Oktave 4	C
+Pitch_Cis4	EQU	100		; Oktave 4	Cis/Des
+Pitch_D4	EQU	102		; Oktave 4	D
+Pitch_Dis4	EQU	104		; Oktave 4	Dis/Es
+Pitch_E4	EQU	106		; Oktave 4	E
+Pitch_F4	EQU	108		; Oktave 4	F
+Pitch_Fis4	EQU	110		; Oktave 4	Fis/Ges
+Pitch_G4	EQU	112		; Oktave 4	G
+Pitch_Gis4	EQU	114		; Oktave 4	Gis
+Pitch_A4	EQU	116		; Oktave 4	A
+Pitch_Ais4	EQU	118		; Oktave 4	Ais/B
+Pitch_H4	EQU	120		; Oktave 4 	H
+
+Pitch_C5	EQU	122		; Oktave 5	C
+Pitch_Cis5	EQU	124		; Oktave 5	Cis/Des
+Pitch_D5	EQU	126		; Oktave 5	D
+Pitch_Dis5	EQU	128		; Oktave 5	Dis/Es
+Pitch_E5	EQU	130		; Oktave 5	E
+Pitch_F5	EQU	132		; Oktave 5	F
+Pitch_Fis5	EQU	134		; Oktave 5	Fis/Ges
+Pitch_G5	EQU	136		; Oktave 5	G
+Pitch_Gis5	EQU	138		; Oktave 5	Gis
+Pitch_A5	EQU	140		; Oktave 5	A
+Pitch_Ais5	EQU	142		; Oktave 5	Ais/B
+Pitch_H5	EQU	144		; Oktave 5 	H
+
+Pitch_C6	EQU	146		; Oktave 6	C
+Pitch_Cis6	EQU	148		; Oktave 6	Cis/Des
+Pitch_D6	EQU	150		; Oktave 6	D
+Pitch_Dis6	EQU	152		; Oktave 6	Dis/Es
+Pitch_E6	EQU	154		; Oktave 6	E
+Pitch_F6	EQU	156		; Oktave 6	F
+Pitch_Fis6	EQU	158		; Oktave 6	Fis/Ges
+Pitch_G6	EQU	160		; Oktave 6	G
+Pitch_Gis6	EQU	162		; Oktave 6	Gis
+Pitch_A6	EQU	164		; Oktave 6	A
+Pitch_Ais6	EQU	168		; Oktave 6	Ais/B
+Pitch_H6	EQU	170		; Oktave 6 	H
+
+Fx_Sample1	EQU	2		; Fx Sample 1
+Fx_Sample2	EQU	4		; Fx Sample 2
+Fx_Sample3	EQU	6		; Fx Sample 3
+Fx_Sample4	EQU	8		; Fx Sample 4
+Fx_Sample5	EQU	10		; Fx Sample 5
+Fx_Sample6	EQU	12		; Fx Sample 6
+Fx_Sample7	EQU	14		; Fx Sample 7
+Fx_Sample8	EQU	16		; Fx Sample 8
+Fx_Sample9	EQU	18		; Fx Sample 9
+Fx_Sample10	EQU	20		; Fx Sample 10
+Fx_Sample11	EQU	22		; Fx Sample 11
+Fx_Sample12	EQU	24		; Fx Sample 12
+Fx_Sample13	EQU	26		; Fx Sample 13
+Fx_Sample14	EQU	28		; Fx Sample 14
+Fx_Sample15	EQU	30		; Fx Sample 15
+Fx_Sample16	EQU	32		; Fx Sample 16
+Fx_Sample17	EQU	34		; Fx Sample 17
+Fx_Sample18	EQU	36		; Fx Sample 18
+Fx_Sample19	EQU	38		; Fx Sample 19
+Fx_Sample20	EQU	40		; Fx Sample 20
+Fx_Sampel21	EQU	42		; Fx Sample 21
+Fx_Sample22	EQU	44		; Fx Sample 22
+Fx_Sample23	EQU	46		; Fx Sample 23
+Fx_Sample24	EQU	48		; Fx Sample 24
+Fx_Sample25	EQU	50		; Fx Sample 25
+Fx_Sample26	EQU	52		; Fx Sample 26
+Fx_Sample27	EQU	54		; Fx Sample 27
+Fx_Sample28	EQU	56		; Fx Sample 28
+Fx_Sample29	EQU	58		; Fx Sample 29
+Fx_Sample30	EQU	60		; Fx Sample 30
+Fx_Sample31	EQU	62		; Fx Sample 31

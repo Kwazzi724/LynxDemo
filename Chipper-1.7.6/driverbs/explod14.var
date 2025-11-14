@@ -1,0 +1,29 @@
+
+BEGIN_ZP
+
+exploder_zeropage_start
+
+* WORD Registers
+*     MUESSEN Zeropage sein
+
+Expl_a0		ds	2
+Expl_a2		ds	2
+Expl_a3		ds	2
+Expl_a4		ds	2
+
+*     KOENNEN Zeropage sein
+Expl_d2w		ds	2
+Expl_d5w		ds	2
+
+* Byte Registers
+Expl_d0		ds	1
+Expl_d1		ds	1
+Expl_d3		ds	1
+Expl_d4		ds	1
+
+* Table
+Expl_TabSP		ds	28
+
+END_ZP
+
+echo "Exploder needs 44 Bytes Zeropage"

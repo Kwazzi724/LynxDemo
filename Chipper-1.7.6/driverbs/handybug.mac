@@ -1,0 +1,14 @@
+;;
+;;  Uses the Hadnybug features for debugging
+;;  be careful, Status Register is NOT saved
+;;
+
+  MACRO HANDYBUG_REG
+	  cpx $5aa5
+	  cpx $ffff
+  ENDM
+
+  MACRO HANDYBUG_TXT
+	  cpx $5aa5
+	  cpx \0
+  ENDM

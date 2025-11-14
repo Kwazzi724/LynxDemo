@@ -1,0 +1,184 @@
+
+
+		MACRO LYNX_CHIP_INIT
+			lda #1
+			sta	ch1_start		; Lo Byte Startadresse Soundkanal 1 init
+			stz	ch1_start+1		; Hi Byte Startadresse Soundkanal 1 init
+			stz	ch1_end			; Lo Byte End Adresse Soundkanal 1 init
+			stz	ch1_end+1		; Hi Byte End Adresse Soundkanal 1 init
+			stz	ch1_repeat		; kein Repeat Adresse Soundkanal 1 init
+			; Damit ist Start>End -> nix abspielen
+		ENDM
+
+		MACRO LYNX_CHIP_HBL
+			; 1 Channel auf Kanal 4 ausgeben
+			CMPW	ch1_start,ch1_end	; Ende Sample erreicht ?
+			bpl	.pl0			; Nein
+				lda	ch1_repeat		; Sample Wiederholen ?
+				beq	.lchbl		; Nein
+				MOVE	ch1_rep_start,ch1_start	; Repeat Startadresse setzen
+				MOVE	ch1_rep_end,ch1_end	; Repeat Endadresse setzen
+.pl0		lda	(ch1_start)		; Samplebyte laden
+			phx
+			ldx ch1_adroffset
+			sta	$fd20+2,x		; Samplebyte ausgeben
+			plx
+	        clc					; Carry Flag l”schen
+	        lda	ch1_off2		; Nachkomma.lo Periode
+	        adc	ch1_off3		; + Nachkomma.lo Sample-Adresse
+	        sta	ch1_off3		; = Nachkomma.lo Sample-Adresse
+	        lda	ch1_off1		; Vorkomma Periode
+	        adc	ch1_start		; + Vorkomma Sample-Adresse
+	        sta	ch1_start		; (nur 8 Bit Vorkomma)
+	        bcc	.lchbl
+		        inc	ch1_start+1
+.lchbl
+		ENDM
+
+		MACRO CHAN_STOP
+		dc.b 0
+		ENDM
+
+		;* Play Note, Delay
+        ;* To be Changed
+		MACRO PLAY
+		dc.b \0
+		IF \1 > 255
+		dc.b 0
+ps2     set \1-256
+		DELAY ps2
+		ELSE
+		dc.b \1
+		ENDIF
+		ENDM
+
+		MACRO DO
+		dc.b $80,\0
+		ENDM
+		MACRO LOOP
+		dc.b $81
+		ENDM
+
+		MACRO DELAY
+ps    set \0
+		REPT 50
+		IF ps > 255
+		  dc.b $82,0
+ps    set ps - 256
+		ELSE
+		  IF ps > 0
+			dc.b $82,ps
+ps      set 0
+		  ENDIF
+		ENDIF
+		ENDR
+		ENDM
+
+		MACRO STOP
+		dc.b $83
+		ENDM
+
+		MACRO SET_INSTR
+		dc.b $84,0,0,\0,\1,\2
+		ENDM
+
+		;* INST WaveEnv,VolEnv
+		MACRO INSTR2
+		dc.b $84,\0,\1,\2,\3,\4
+		ENDM
+
+		;* PLAY2 RELOAD, PRESCALE, DELAY
+        ;* To be Changed
+		MACRO PLAY2
+		dc.b $85
+		dc.b \0     ; reload
+		dc.b \1     ; prescale
+		IF \2 > 255
+		dc.b 0
+ps2     set \2-256
+		DELAY ps2
+		ELSE
+		dc.b \2
+		ENDIF
+		ENDM
+
+
+		;* Jump to Pattern
+		MACRO PATTERN
+		dc.b $86
+		dc.w \0
+		ENDM
+
+		;* Return from Pattern
+		MACRO RETURN
+		dc.b $87
+		ENDM
+
+		MACRO DEF_VOLENV
+		dc.b $88,\0
+		dc.w \1
+		ENDM
+
+		MACRO SET_VOLENV
+		dc.b $89,\0
+		ENDM
+
+		MACRO DEF_FRQENV
+		dc.b $8a,\0
+		dc.w \1
+		ENDM
+
+		MACRO SET_FRQENV
+		dc.b $8b,\0
+		ENDM
+
+		MACRO DEF_WAVEENV
+		dc.b $8c,\0
+		dc.w \1
+		ENDM
+
+		MACRO SET_WAVEENV
+		dc.b $8d,\0
+		ENDM
+
+		;* Set Stereo / $FD50
+		;* for all channels
+		MACRO SET_STEREO
+		dc.b $8e,\0
+		ENDM
+
+		;* Set Attenuation On/Off / $FD44
+		;* for all channels
+		MACRO SET_ATT_ON
+		dc.b $8f,\0
+		ENDM
+
+		;* Set Attenuation per Channel / $FD40-43
+		MACRO SET_CH_ATT
+		dc.b $90,\0
+		ENDM
+
+		;* SETPLAYERFREQ RELOAD, PRESCALE
+		;* work globally and direct!
+		MACRO SETPLAYERFREQ
+        dc.b $91,\0,\1
+		ENDM
+
+		;* Return all
+		;* maybe a better impementation, return immediatly and read ahead one command
+		;* return all channels _after_ next tick, adds a 1 tick delay.
+		MACRO RETURNALL
+		dc.b $92
+		ENDM
+
+*;        MACRO SETSAMPLE
+*;        dc.b $91,\0
+*; 		dc.w \1
+*; 		; SampleNr, Adresse
+*;        ENDM
+*;
+*;        MACRO PLAYSAMPLE
+*;        dc.b $92,\0,\1
+*;;		 ;;SampleNr, Frequenz
+*;        ENDM
+

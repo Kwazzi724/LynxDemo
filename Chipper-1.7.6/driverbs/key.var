@@ -1,0 +1,12 @@
+; BSS-Variablen KEY
+; 23.6.93
+; letzte Žnderung : 301193/291193
+
+BEGIN_ZP
+KeyCounter	ds 2
+LastButton	ds 1
+LastCursor	ds 1
+PauseEnable	ds 1
+PauseFlag	ds 1
+PausePtr	ds 4
+END_ZP

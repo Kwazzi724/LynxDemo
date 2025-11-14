@@ -1520,6 +1520,41 @@ static void run_walk_to_house_scene(void)
     run_raycaster_scene();
 }
 
+void init_music(void)
+{
+    asm("jsr SndInit");
+}
+
+void start_music(void)
+{
+    asm("jsr SndPauseOn");
+    asm("lda musicptr+0");
+    asm("ldy musicptr+1");
+    asm("ldx #0");
+    asm("jsr SndStartSound");
+    asm("lda musicptr+2");
+    asm("ldy musicptr+3");
+    asm("ldx #1");
+    asm("jsr SndStartSound");
+    asm("lda musicptr+4");
+    asm("ldy musicptr+5");
+    asm("ldx #2");
+    asm("jsr SndStartSound");
+    asm("lda musicptr+6");
+    asm("ldy musicptr+7");
+    asm("ldx #3");
+    asm("jsr SndStartSound");
+    asm("jsr SndPauseOff");
+}
+
+void update_music()
+{
+    asm("lda $fd22");
+    asm("sta $fdb0");
+    asm("lda $fd32");
+    asm("sta $fda0");
+}
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -1532,6 +1567,9 @@ void main(void)
     tgi_init();
     CLI(); // init interupts
     while (tgi_busy()) {}
+
+    init_music();
+    start_music();
 
     // PART 1 GREETS
     scene_writing_hello();
