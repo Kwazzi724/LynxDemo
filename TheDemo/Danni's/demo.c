@@ -57,7 +57,7 @@ static void small_delay(void)
 ///////// PART 1: GREET /////////
 
 #define draw_color 9
-#define delay_cycles 400
+#define delay_cycles 100
 
 #define screen_w 160
 #define screen_y 102
@@ -941,9 +941,7 @@ static const Tile PATH[] = {
 
 static const Tile ART_TILES[] =
 {
-    {6, 5},  
-    // {5, 5},
- 
+    {6, 5}, // renders the first painting
 };
 #define ART_TILE_COUNT ((int)(sizeof(ART_TILES)/sizeof(ART_TILES[0])))
 
@@ -1203,21 +1201,8 @@ static void show_art_effect(unsigned char index)
 {
     switch (index)
     {
-    case 0: // stilllife
-        // drawStilllife();
-        drawRaytrace(1);
-        break;
-    case 1: // fem1
-        // drawFem1();
-        // drawRaytrace(1);
-        break;
-    case 2: // male
-        // drawMale();
-        //drawRaytrace(2);
-        break;
-    case 3: // malegamer
-        // drawMaleGamer();
-        // drawRaytrace();
+    case 0: 
+        drawRaytrace(3);
         break;
     default:
         return;
@@ -1248,6 +1233,33 @@ static void pause_at_painting(unsigned char seconds, unsigned char artIndex)
     tgi_updatedisplay();
 
     show_art_effect(artIndex);
+    tgi_updatedisplay();
+    wait_seconds(RAYTRACE_SHOW_SECONDS);
+}
+
+static void pause_at_painting_with_index(unsigned char seconds, unsigned char artIndex)
+{
+    unsigned int frames;
+    unsigned int i;
+    frames = (unsigned int)seconds * 5;
+
+    for (i = 0; i < frames; ++i)
+    {
+        // redraw current scene/raycaster
+        cast_smooth_rays();
+        // overlay painting rectangle
+        draw_painting_rect();
+        tgi_updatedisplay();
+        small_delay();
+    }
+
+    // show the full-screen raytracer art for this painting
+    tgi_setbgcolor(0);
+    tgi_clear();
+    while (tgi_busy()) {}
+    tgi_updatedisplay();
+    drawRaytrace(artIndex);
+    //show_art_effect(artIndex);
     tgi_updatedisplay();
     wait_seconds(RAYTRACE_SHOW_SECONDS);
 }
@@ -1389,6 +1401,8 @@ static void run_raycaster_scene(void)
         //}
 
         // detect when player just stepped onto a new tile 
+
+        // small debug function
         if (path_index != last_path_index)
         {
             unsigned char tx;
@@ -1399,6 +1413,11 @@ static void run_raycaster_scene(void)
             tx = PATH[path_index].x;
             ty = PATH[path_index].y;
 
+           if (tx == 6 && ty == 5 && path_index < PATH_LEN)
+            {
+                pause_at_painting(1, 0);
+            }
+
             // if window tile: show rainy window
             if (is_window_tile_xy(tx, ty) && path_index < PATH_LEN)
             {
@@ -1407,11 +1426,11 @@ static void run_raycaster_scene(void)
             else
             {
                 // if art tile: show painting + matching piece
-                artIndex = find_art_index_for_tile(tx, ty);
-                if (artIndex >= 0 && path_index < PATH_LEN)
+                /*artIndex = 0;
+                if (artIndex == 0 && path_index < PATH_LEN)
                 {
                     pause_at_painting(1, (unsigned char)artIndex);
-                }
+                }*/
             }
         }
     }
@@ -1421,37 +1440,10 @@ static void run_raycaster_scene(void)
     tgi_clear();
     while (tgi_busy()) {}
     tgi_updatedisplay();
-
     // dok's full-screen raytracer painting
     drawRaytrace(0);
-    // drawMaleGamer();
     tgi_updatedisplay();      // in case lib doesn't do it itself
     wait_seconds(3);          // show raytracer for 8 seconds
-
-    //// then: clear screen and show closing sentence
-    //tgi_setbgcolor(0);
-    //tgi_clear();
-    //while (tgi_busy()) {}
-    //tgi_updatedisplay();
-
-    //show_sentence_center("finally, from there,", "I slipped into", 2);
-    //show_sentence_center("a deeper,", "more abstract sleep.", 2);
-
-    //// expanding circles for about 16 seconds
-    //scene_expanding_circles();
-
-    //// final thank you & credits scene
-    //tgi_setbgcolor(0);
-    //tgi_clear();
-    //while (tgi_busy()) {}
-    //tgi_updatedisplay();
-
-    //show_sentence_center("Thanks everyone!", "we are Beige :)", 5);
-
-    //// hold final frame 
-    //for (;;)
-    //{
-    //}
 }
 
 static void run_ending_scene(void)
