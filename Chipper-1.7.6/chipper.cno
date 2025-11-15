@@ -7,26 +7,26 @@
 [CheckTimer]
 104,104,0,0
 [Simple Instrument]
--8,-8,0,0
+29,0,0,0
 [EasyTrack]
 52,52,0,0
 [Schnittstelle wählen]
--1280,-78,0,0
+0,0,0,0
 [Transfer 2 Lynx]
 26,26,0,0
 [Chip Tracker]
-645,29,885,888
+329,8,885,679
 [MOD Import und Convert]
-167,217,0,0
+310,166,0,0
 [Converter]
-208,208,0,0
+563,56,0,0
 [Effect Editor]
 182,182,0,0
 [Envelopes]
 156,156,0,0
 [LenSort]
-866,8,0,0
+576,0,0,0
 [Waveform Creator]
 1926,320,0,0
 [Lynx Chipper]
-1512,580,0,0
+914,352,0,0
