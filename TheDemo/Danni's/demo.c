@@ -57,12 +57,13 @@ static void small_delay(void)
 ///////// PART 1: GREET /////////
 
 #define draw_color 9
-#define delay_cycles 800
+#define delay_cycles 100
 
 #define screen_w 160
 #define screen_y 102
+#define HELLO_OFFSET_X 8;
 
-static const unsigned char HELLO[][2] = {
+static const unsigned char HELLO[][2] = /*{
     {27,30},{27,31},{27,32},{27,33},{27,34},{27,35},
     {26,36},{26,37},{26,38},{26,39},{26,40},{26,41},{26,42},
     {25,43},{25,44},{25,45},{25,46},{25,47},{25,48},{25,49},{25,50},{25,51},{25,52},{25,53},{25,54},{25,55},{25,56},{25,57},{25,58},{25,59},{25,60},
@@ -82,8 +83,30 @@ static const unsigned char HELLO[][2] = {
     {89,47},{89,48},{89,49},{89,50},{90,51},{90,52},{91,53},{92,54},{93,54},{93,55},{94,55},{95,55},{96,55},{97,55},{98,55},{99,55},{100,55},
     {101,54},{102,54},{102,53},{103,53},{103,52},{104,51},{104,50},{104,49},{104,48},{104,47},
     {114,31},{114,32},{114,33},{114,34},{114,35},{115,36},{115,37},{115,38},{115,39},{115,40},{115,41},{115,42},{115,43},{115,44},{115,45},
-    {115,50},{115,51},{115,52},{116,53},{116,54},{116,55}
+    {115,50},{115,51},{115,52},{116,53},{116,54},{116,55}*/
+    {
+   {13,35},{13,36},{13,37},{13,38},{12,39},{12,40},{12,41},{12,42},{12,43},{12,44},{11,45},{11,46},{11,47},{11,48},{10,49},{10,50},
+    {10,51},{9,52},{8,53},{8,54},{8,55},{7,56},{6,57},{6,58},{6,59},{5,60},{4,61},{4,62},{4,63},{3,64},{3,65},{2,66},
+    {2,67},{2,68},{2,69},{1,70},{1,71},{1,72},{13,34},{14,34},{15,34},{16,33},{17,33},{18,33},{19,33},{20,33},{21,33},{22,33},
+    {23,33},{24,33},{25,34},{26,34},{27,34},{28,35},{29,35},{30,36},{30,37},{31,38},{31,39},{31,40},{30,41},{30,42},{30,43},{29,44},
+    {28,45},{27,46},{26,47},{25,47},{24,47},{23,48},{22,48},{21,48},{20,48},{19,49},{18,49},{17,49},{16,49},{15,50},{14,50},{13,50},
+    {12,51},{11,51},{8,52},{7,52},{18,62},{17,62},{16,63},{15,63},{14,64},{13,64},{12,64},{11,65},{10,65},{9,66},{8,67},{8,68},
+    {7,69},{8,69},{9,69},{10,69},{11,69},{12,68},{13,67},{14,66},{15,65},{16,64},{17,63},{18,63},{18,64},{18,65},{18,66},{18,67},
+    {19,67},{20,66},{21,66},{22,66},{23,65},{24,65},{25,64},{26,64},{26,65},{26,66},{25,67},{24,68},{24,69},{25,68},{27,65},{28,64},
+    {29,64},{30,64},{31,64},{32,64},{33,64},{34,64},{35,63},{36,63},{37,63},{33,65},{32,66},{31,67},{30,68},{30,69},{31,68},{32,68},
+    {33,68},{34,67},{35,66},{35,65},{36,64},{38,63},{37,64},{36,65},{36,66},{35,67},{36,68},{37,68},{38,68},{39,67},{40,66},{41,65},
+    {42,64},{43,64},{44,63},{45,63},{46,62},{47,62},{45,62},{44,64},{45,65},{45,66},{45,67},{45,68},{44,68},{43,69},{42,70},{41,70},
+    {40,70},{42,69},{44,69},{46,68},{47,68},{48,68},{49,68},{50,67},{51,67},{52,66},{53,66},{54,65},{55,64},{56,63},{57,62},{54,64},
+    {53,65},{52,67},{53,68},{54,69},{54,70},{55,69},{56,68},{57,67},{58,66},{59,65},{58,64},{58,63},{59,63},{60,63},{61,63},{62,63},
+    {63,63},{63,64},{63,65},{62,66},{62,67},{63,67},{64,66},{65,66},{66,65},{67,65},{68,64},{69,64},{70,63},{71,63},{72,63},{73,63},
+    {72,64},{72,65},{71,66},{73,64},{74,64},{75,63},{76,62},{77,61},{78,60},{79,59},{80,60},{80,61},{79,62},{78,63},{78,64},{78,65},
+    {77,66},{77,67},{78,67},{79,66},{80,65},{81,64},{82,63},{83,63},{84,62},{85,61},{86,60},{87,60},{88,59},{88,60},{88,61},{87,62},
+    {87,63},{87,64},{86,65},{86,66},{87,65},{88,64},{89,64},{90,63},{91,62},{92,61},{93,60},{93,61},{93,62},{93,63},{94,64},{95,64},
+    {96,64},{97,63},{98,62},{99,61},{100,60},{101,59},{100,61},{99,62},{98,63},{99,64},{100,65},{101,65},{102,64},{103,64},{104,63},{105,63},
+    {106,63},{107,62},{108,62},{109,62},{108,63},{107,63},{106,64},{105,65},{107,64},{109,63},{110,62},{111,61},{112,60},{112,59},{113,58},{114,57},
+    {114,58},{113,59},{112,61},{112,62},{112,63},{111,64},{111,65},{110,65},{98,42}
 };
+
 static const unsigned int HELLO_LENGTH = sizeof(HELLO) / sizeof(HELLO[0]);
 
 static void slow_down(void)
@@ -98,6 +121,8 @@ static void slow_down(void)
 static void scene_writing_hello(void)
 {
     int i;
+    int x = (int)HELLO[i][0] - 1 + HELLO_OFFSET_X;
+    int y = (int)HELLO[i][1] - 1;
 
     tgi_clear();
     while (tgi_busy()) {}
@@ -107,9 +132,6 @@ static void scene_writing_hello(void)
     // Draw each pixel in order
     for (i = 0; i < (int)HELLO_LENGTH; ++i)
     {
-        int x = (int)HELLO[i][0] - 1;
-        int y = (int)HELLO[i][1] - 1;
-
         // clamp to screen
         if (x < 0) x = 0; else if (x >= screen_w) x = screen_w - 1;
         if (y < 0) y = 0; else if (y >= screen_y) y = screen_y - 1;
@@ -915,10 +937,7 @@ static const Tile PATH[] = {
 
 static const Tile ART_TILES[] =
 {
-    {6, 5},// stilllife 
-    {5, 5},// fem1 
-    // {1, 3},// male 
-    // {2, 3},// malegamer 
+    {6, 5}, // renders the first painting
 };
 #define ART_TILE_COUNT ((int)(sizeof(ART_TILES)/sizeof(ART_TILES[0])))
 
@@ -1178,21 +1197,8 @@ static void show_art_effect(unsigned char index)
 {
     switch (index)
     {
-    case 0: // stilllife
-        // drawStilllife();
-        drawRaytrace(0);
-        break;
-    case 1: // fem1
-        // drawFem1();
-        drawRaytrace(1);
-        break;
-    case 2: // male
-        // drawMale();
-        drawRaytrace(2);
-        break;
-    case 3: // malegamer
-        // drawMaleGamer();
-        // drawRaytrace();
+    case 0: 
+        drawRaytrace(3);
         break;
     default:
         return;
@@ -1223,6 +1229,33 @@ static void pause_at_painting(unsigned char seconds, unsigned char artIndex)
     tgi_updatedisplay();
 
     show_art_effect(artIndex);
+    tgi_updatedisplay();
+    wait_seconds(RAYTRACE_SHOW_SECONDS);
+}
+
+static void pause_at_painting_with_index(unsigned char seconds, unsigned char artIndex)
+{
+    unsigned int frames;
+    unsigned int i;
+    frames = (unsigned int)seconds * 5;
+
+    for (i = 0; i < frames; ++i)
+    {
+        // redraw current scene/raycaster
+        cast_smooth_rays();
+        // overlay painting rectangle
+        draw_painting_rect();
+        tgi_updatedisplay();
+        small_delay();
+    }
+
+    // show the full-screen raytracer art for this painting
+    tgi_setbgcolor(0);
+    tgi_clear();
+    while (tgi_busy()) {}
+    tgi_updatedisplay();
+    drawRaytrace(artIndex);
+    //show_art_effect(artIndex);
     tgi_updatedisplay();
     wait_seconds(RAYTRACE_SHOW_SECONDS);
 }
@@ -1364,6 +1397,8 @@ static void run_raycaster_scene(void)
         //}
 
         // detect when player just stepped onto a new tile 
+
+        // small debug function
         if (path_index != last_path_index)
         {
             unsigned char tx;
@@ -1374,6 +1409,11 @@ static void run_raycaster_scene(void)
             tx = PATH[path_index].x;
             ty = PATH[path_index].y;
 
+           if (tx == 6 && ty == 5 && path_index < PATH_LEN)
+            {
+                pause_at_painting(1, 0);
+            }
+
             // if window tile: show rainy window
             if (is_window_tile_xy(tx, ty) && path_index < PATH_LEN)
             {
@@ -1382,11 +1422,11 @@ static void run_raycaster_scene(void)
             else
             {
                 // if art tile: show painting + matching piece
-                artIndex = find_art_index_for_tile(tx, ty);
-                if (artIndex >= 0 && path_index < PATH_LEN)
+                /*artIndex = 0;
+                if (artIndex == 0 && path_index < PATH_LEN)
                 {
                     pause_at_painting(1, (unsigned char)artIndex);
-                }
+                }*/
             }
         }
     }
@@ -1396,37 +1436,10 @@ static void run_raycaster_scene(void)
     tgi_clear();
     while (tgi_busy()) {}
     tgi_updatedisplay();
-
     // dok's full-screen raytracer painting
-    drawRaytrace(3);
-    // drawMaleGamer();
+    drawRaytrace(0);
     tgi_updatedisplay();      // in case lib doesn't do it itself
     wait_seconds(3);          // show raytracer for 8 seconds
-
-    //// then: clear screen and show closing sentence
-    //tgi_setbgcolor(0);
-    //tgi_clear();
-    //while (tgi_busy()) {}
-    //tgi_updatedisplay();
-
-    //show_sentence_center("finally, from there,", "I slipped into", 2);
-    //show_sentence_center("a deeper,", "more abstract sleep.", 2);
-
-    //// expanding circles for about 16 seconds
-    //scene_expanding_circles();
-
-    //// final thank you & credits scene
-    //tgi_setbgcolor(0);
-    //tgi_clear();
-    //while (tgi_busy()) {}
-    //tgi_updatedisplay();
-
-    //show_sentence_center("Thanks everyone!", "we are Beige :)", 5);
-
-    //// hold final frame 
-    //for (;;)
-    //{
-    //}
 }
 
 static void run_ending_scene(void)
@@ -1479,7 +1492,7 @@ static void run_walk_to_house_scene(void)
     }
 
     // PHASE B: stand in centre, simulate walk by scrolling road (for about ~4s) 
-    for (step = 0; step < 80; ++step)
+    for (step = 0; step < 40; ++step)
     {
         ManFrame frame = (step / 1) & 1 ? MAN_FRAME_LEFT_FWD : MAN_FRAME_RIGHT_FWD;
 
