@@ -26,41 +26,40 @@ static unsigned char dungeonPalette[32] = {
     //0x5E, 0x0F, 0xAF, 0x4D,
     //0x48, 0xFF, 0x88, 0x00
 
-    // 0..15: green components (G) 
-    0x00, /* 0 black          */
-    0x01, /* 1 dark brown     */
-    0x03, /* 2 mid brown      */
-    0x04, /* 3 light brown    */
-    0x02, /* 4 shadow purple  */
-    0x02, /* 5 dark grey-blue */
-    0x04, /* 6 mid grey-blue  */
-    0x07, /* 7 highlight grey */
-    0x08, /* 8 torch yellow   */
-    0x06, /* 9 torch orange   */
-    0x0C, /* 10 bone white    */
-    0x00, /* 11 deep shadow   */
-    0x01, /* 12 dark mortar   */
-    0x06, /* 13 bright blue   */
-    0x03, /* 14 accent red    */
-    0x00, /* 15 spare/black   */
+    // first 16 high byte / green components (G) 
+    0x00, // 0 black          
+    0x01, // 1 dark brown     
+    0x03, // 2 mid brown      
+    0x04, // 3 light brown    
+    0x02, // 4 shadow purple  
+    0x02, // 5 dark grey-blue 
+    0x04, // 6 mid grey-blue  
+    0x07, // 7 highlight grey 
+    0x08, // 8 yellow   
+    0x06, // 9 orange   
+    0x0C, // 10 white    
+    0x00, // 11 shadow   
+    0x01, // 12 dark grey   
+    0x06, // 13 blue   
+    0x03, // 14 red    
+    0x00, // 15 spare
 
-    // 16..31: blue+red packed (BBBBRRRR)
-    0x00, /* 0 black          (B=0,R=0)   */
-    0x14, /* 1 dark brown     (B=1,R=4)   */
-    0x27, /* 2 mid brown      (B=2,R=7)   */
-    0x39, /* 3 light brown    (B=3,R=9)   */
-    0x35, /* 4 shadow purple  (B=3,R=5)   */
-    0x54, /* 5 dark grey-blue (B=5,R=4)   */
-    0x87, /* 6 mid grey-blue  (B=8,R=7)   */
-    0xAA, /* 7 highlight grey (B=10,R=10) */
-    0x2F, /* 8 torch yellow   (B=2,R=15)  */
-    0x1E, /* 9 torch orange   (B=1,R=14)  */
-    0xCF, /* 10 bone white    (B=12,R=15) */
-    0x11, /* 11 deep shadow   (B=1,R=1)   */
-    0x23, /* 12 dark mortar   (B=2,R=3)   */
-    0xFA, /* 13 bright blue   (B=15,R=10) */
-    0x1F, /* 14 accent red    (B=1,R=15)  */
-    0x00  /* 15 spare/black   (B=0,R=0)   */
+    // next 16 low byte /  blue & red packed (BBBBRRRR)
+    0x00, 
+    0x14, 
+    0x39, 
+    0x35, 
+    0x54, 
+    0x87,
+    0xAA, 
+    0x2F, 
+    0x1E, 
+    0xCF, 
+    0x11, 
+    0x23, 
+    0xFA,
+    0x1F, 
+    0x00 
 
     // 0x04, /* 0: 446 -> G=4 */
     //0x00, /* 1: 000 -> G=0 */
