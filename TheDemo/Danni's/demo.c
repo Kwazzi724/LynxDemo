@@ -57,11 +57,11 @@ static void small_delay(void)
 ///////// PART 1: GREET /////////
 
 #define draw_color 9
-#define delay_cycles 100
+#define delay_cycles 400
 
 #define screen_w 160
 #define screen_y 102
-#define HELLO_OFFSET_X 8;
+#define HELLO_OFFSET_X 20;
 
 static const unsigned char HELLO[][2] = /*{
     {27,30},{27,31},{27,32},{27,33},{27,34},{27,35},
@@ -121,8 +121,8 @@ static void slow_down(void)
 static void scene_writing_hello(void)
 {
     int i;
-    int x = (int)HELLO[i][0] - 1 + HELLO_OFFSET_X;
-    int y = (int)HELLO[i][1] - 1;
+    int x;
+    int y;
 
     tgi_clear();
     while (tgi_busy()) {}
@@ -132,6 +132,8 @@ static void scene_writing_hello(void)
     // Draw each pixel in order
     for (i = 0; i < (int)HELLO_LENGTH; ++i)
     {
+        x = (int)HELLO[i][0] - 1 + HELLO_OFFSET_X;
+        y = (int)HELLO[i][1] - 1;
         // clamp to screen
         if (x < 0) x = 0; else if (x >= screen_w) x = screen_w - 1;
         if (y < 0) y = 0; else if (y >= screen_y) y = screen_y - 1;
@@ -346,7 +348,7 @@ static void scene_man_with_text(void)
     // sentences and their timing
     show_sentence("I am in this", "dream again,", 2);
     // show_sentence("I have had it", "countless times.", 3);
-    show_sentence("I must go to", "the house.", 3);
+    show_sentence("I must go to", "the house.", 2);
     // show_sentence("There is no other", "place like it.", 3);
     show_sentence("The silent,", "crystalline", 2);
     show_sentence("palace of", "my mind.", 2);
@@ -1439,7 +1441,67 @@ static void run_raycaster_scene(void)
     // dok's full-screen raytracer painting
     drawRaytrace(0);
     tgi_updatedisplay();      // in case lib doesn't do it itself
-    wait_seconds(3);          // show raytracer for 8 seconds
+    wait_seconds(1);          // show raytracer for 8 seconds
+}
+
+static void show_credits(
+    const char* line1,
+    const char* line2,
+    const char* line3,
+    const char* line4,
+    const char* line5,
+    const char* line6,
+    unsigned char hold_seconds)
+{
+    int height;
+    int spacing;
+    int totalHeight;
+    int y0;
+    int w;
+    int x;
+    const char* lines[6];
+    int i;
+    lines[0] = line1;
+    lines[1] = line2;
+    lines[2] = line3;
+    lines[3] = line4;
+    lines[4] = line5;
+    lines[5] = line6;
+    tgi_setbgcolor(0);
+    tgi_clear();
+    while (tgi_busy()) {}
+    tgi_setcolor(TEXT_COLOR);
+    height = tgi_gettextheight("A");
+    if (height <= 0)
+        height = 8;
+    spacing = 2;  
+    totalHeight = 6 * height + 5 * spacing;
+    if (totalHeight > SCREEN_HEIGHT)
+    {
+        spacing = 1;
+        totalHeight = 6 * height + 5 * spacing;
+    }
+    y0 = (SCREEN_HEIGHT - totalHeight) / 2;
+    if (y0 < 0)
+        y0 = 0;
+    for (i = 0; i < 6; ++i)
+    {
+        const char* text = lines[i];
+        int y = y0 + i * (height + spacing);
+        if (y >= SCREEN_HEIGHT)
+            break;
+        if (text && text[0] != '\0')
+        {
+            w = tgi_gettextwidth(text);
+            if (w < SCREEN_WIDTH)
+                x = (SCREEN_WIDTH - w) / 2;
+            else
+                x = 0;
+            tgi_outtextxy(x, y, text);
+        }
+    }
+    tgi_updatedisplay();
+    wait_seconds(hold_seconds);
 }
 
 static void run_ending_scene(void)
@@ -1449,8 +1511,42 @@ static void run_ending_scene(void)
     while (tgi_busy()) {}
     tgi_updatedisplay();
 
-    show_sentence_center("Thanks everyone!", "we are Beige :)", 5);
-
+    show_sentence_center("Code", "danni", 2);
+    show_sentence_center("GFX", "DOK", 2);
+    show_sentence_center("Music", "Vectrex", 2);
+    show_sentence_center("Thanks everyone!", "we are Beige :)", 4);
+    show_credits
+    (
+        "Syntax Party Crew",
+        "Aday Disaster Area",
+        "Pelrun Shock cTrix",
+        "Gaia Chicken Abbie",
+        "TommityTom AJ",
+        "Rika Mudlord DQH",
+        4
+    );
+    show_credits
+    (
+        "Vblinds STYL3Z Zig",
+        "Bananaboy Jazzcat",
+        "Animalbro Pselodux",
+        "ILKKE Duck Darkowl",
+        "Ript Voltage Krion",
+        "Reverie Bev",
+        4
+    );
+    show_credits
+    (
+        "Sumaleth Reload",
+        "Maveritan Defame",
+        "Grey Birorun",
+        "Hellfire64",
+        "",
+        "",
+        3
+    );
+    
+    show_sentence_center("The End!", "Thanks!", 2);
     // hold final frame 
     for (;;)
     {
@@ -1583,10 +1679,11 @@ void main(void)
     while (tgi_busy()) {}
 
     init_music();
-    start_music();
+    // run_ending_scene();
 
     // PART 1 GREETS
     scene_writing_hello();
+    start_music();
 
     // Blank for 3 sec
     tgi_setbgcolor(0);
@@ -1605,7 +1702,7 @@ void main(void)
     run_walk_to_house_scene(); // this calls raycaster
 
     //  closing sentences
-    show_sentence_center("finally, from there,", "I slipped into", 2);
+    show_sentence_center("Finally, from there,", "I slipped into", 2);
     show_sentence_center("a deeper,", "softer sleep.", 2);
 
     // PART 4 EXPANDING CIRCLES
